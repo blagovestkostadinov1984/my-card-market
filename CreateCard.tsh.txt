@@ -1,0 +1,63 @@
+import React, { useState } from 'react';
+import { BirthdayCard } from '../components/BirthdayCard';
+
+const OCCASIONS = {
+  Birthday: { label: "Birthday", text: "Happy Birthday", images: ["https://images.unsplash.com/photo-1530103862676-fa8c9134ba68?w=500", "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=500"] },
+  Anniversary: { label: "Anniversary", text: "Happy Anniversary", images: ["https://images.unsplash.com/photo-1515934751635-c81c6bc9a2d8?w=500", "https://images.unsplash.com/photo-1522673607200-164883eecd0c?w=500"] },
+  Graduation: { label: "Graduation", text: "Congrats, Graduate", images: ["https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=500", "https://images.unsplash.com/photo-1541339907198-e08759dfc3ef?w=500"] }
+};
+
+export default function CreateCard() {
+  const [name, setName] = useState('');
+  const [occKey, setOccKey] = useState<keyof typeof OCCASIONS>('Birthday');
+  const [selectedImg, setSelectedImg] = useState(OCCASIONS.Birthday.images[0]);
+
+  const handleShare = () => {
+    const params = new URLSearchParams({
+      n: btoa(unescape(encodeURIComponent(name))), 
+      img: btoa(selectedImg),
+      t: btoa(OCCASIONS[occKey].text)
+    });
+    const shareUrl = `${window.location.origin}/card?${params.toString()}`;
+    navigator.clipboard.writeText(shareUrl);
+    alert("Link copied! Share it with your friend.");
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto p-6 min-h-screen grid lg:grid-cols-2 gap-12 items-center">
+      <div className="space-y-8">
+        <h1 className="text-5xl font-black text-sky-400">Card<span className="text-orange-500">Market</span></h1>
+        
+        <div className="space-y-4 bg-slate-800 p-6 rounded-2xl border border-slate-700">
+          <input type="text" placeholder="Recipient's Name" className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-sky-400 text-white" 
+            onChange={(e) => setName(e.target.value)} />
+          
+          <select className="w-full p-4 rounded-xl bg-slate-900 border border-slate-700 text-white" 
+            onChange={(e) => {
+              const val = e.target.value as keyof typeof OCCASIONS;
+              setOccKey(val);
+              setSelectedImg(OCCASIONS[val].images[0]);
+            }}>
+            {Object.keys(OCCASIONS).map(k => <option key={k} value={k}>{OCCASIONS[k as keyof typeof OCCASIONS].label}</option>)}
+          </select>
+
+          <div className="grid grid-cols-2 gap-4">
+            {OCCASIONS[occKey].images.map(url => (
+              <img key={url} src={url} onClick={() => setSelectedImg(url)} 
+                className={`rounded-lg cursor-pointer border-4 transition ${selectedImg === url ? 'border-orange-500' : 'border-transparent opacity-50'}`} />
+            ))}
+          </div>
+
+          <button onClick={handleShare} disabled={!name} className="w-full bg-sky-500 hover:bg-sky-400 text-slate-900 font-bold py-4 rounded-xl shadow-lg disabled:opacity-50">
+            COPY SHAREABLE URL
+          </button>
+        </div>
+      </div>
+
+      <div className="hidden lg:block text-center">
+        <p className="text-slate-500 mb-4 uppercase tracking-widest text-xs">Live Preview</p>
+        <BirthdayCard name={name} imgUrl={selectedImg} occasionText={OCCASIONS[occKey].text} />
+      </div>
+    </div>
+  );
+}

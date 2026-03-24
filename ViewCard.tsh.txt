@@ -1,0 +1,45 @@
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import confetti from 'canvas-confetti';
+import { toPng } from 'html-to-image';
+import { BirthdayCard } from '../components/BirthdayCard';
+import { Music, Music2, Download } from 'lucide-react';
+
+export default function ViewCard() {
+  const [searchParams] = useSearchParams();
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [playing, setPlaying] = useState(false);
+  const audio = useRef(new Audio('https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'));
+
+  const name = searchParams.get('n') ? decodeURIComponent(escape(atob(searchParams.get('n')!))) : 'Friend';
+  const img = searchParams.get('img') ? atob(searchParams.get('img')!) : '';
+  const text = searchParams.get('t') ? atob(searchParams.get('t')!) : 'Happy Day';
+
+  useEffect(() => {
+    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#38bdf8', '#f97316'] });
+  }, []);
+
+  const download = () => {
+    if (cardRef.current) toPng(cardRef.current).then(dataUrl => {
+      const link = document.createElement('a');
+      link.download = 'card.png';
+      link.href = dataUrl;
+      link.click();
+    });
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 p-6">
+      <button onClick={() => { if(!playing) audio.current.play(); else audio.current.pause(); setPlaying(!playing); }}
+        className="fixed top-6 right-6 p-4 rounded-full bg-slate-800 text-sky-400 border border-slate-700">
+        {playing ? <Music2 className="animate-pulse" /> : <Music />}
+      </button>
+
+      <BirthdayCard name={name} imgUrl={img} occasionText={text} cardRef={cardRef} />
+
+      <button onClick={download} className="mt-8 flex items-center gap-2 bg-orange-500 text-white px-8 py-3 rounded-full font-bold hover:bg-orange-400 transition">
+        <Download size={20} /> SAVE AS IMAGE
+      </button>
+    </div>
+  );
+}

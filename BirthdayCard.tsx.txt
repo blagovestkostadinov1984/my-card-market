@@ -1,0 +1,29 @@
+import React from 'react';
+
+interface CardProps {
+  name: string;
+  imgUrl: string;
+  occasionText: string;
+  cardRef?: React.RefObject<HTMLDivElement | null>;
+}
+
+export const BirthdayCard = ({ name, imgUrl, occasionText, cardRef }: CardProps) => {
+  return (
+    <div 
+      ref={cardRef} 
+      className="relative w-full aspect-[4/5] max-w-sm bg-slate-800 rounded-2xl overflow-hidden shadow-2xl border border-orange-500/30 mx-auto"
+    >
+      <img src={imgUrl} crossOrigin="anonymous" alt="Card" className="w-full h-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-90" />
+      <div className="absolute bottom-0 left-0 right-0 p-8 text-center">
+        <h2 className="text-3xl font-bold text-white mb-2 leading-tight">
+          {occasionText}, <br/>
+          <span className="text-sky-400">{name || '_____'}</span>!
+        </h2>
+        <p className="text-orange-400 text-xs font-black tracking-[0.3em] uppercase">
+          Best Wishes From CardMarket
+        </p>
+      </div>
+    </div>
+  );
+};
